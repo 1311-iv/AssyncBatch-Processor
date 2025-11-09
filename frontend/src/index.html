@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AsyncBatch Processor - Sistema de Procesamiento Asíncrono</title>
+  <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">
+        <i class="bi bi-file-earmark-code"></i> AsyncBatch Processor
+      </span>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container my-5">
+    
+    <!-- Header Section -->
+    <div class="row mb-4">
+      <div class="col-12 text-center">
+        <h2>Sistema de Procesamiento Asíncrono de Archivos</h2>
+        <p class="text-muted">Sube múltiples archivos CSV/JSON y procesa en lote con Promises</p>
+      </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="row">
+      <div class="col-12">
+        <div id="upload-section" class="card shadow-sm">
+          <!-- FileUploader component se renderiza aquí -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div id="progress-section" class="card shadow-sm d-none">
+          <!-- ProgressTracker component se renderiza aquí -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div id="results-section" class="card shadow-sm d-none">
+          <!-- ResultsTable component se renderiza aquí -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-5 py-3 bg-light text-center">
+    <p class="text-muted mb-0">
+      Proyecto desarrollado con Node.js + Express + MongoDB + Vite + Bootstrap
+    </p>
+  </footer>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
