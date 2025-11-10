@@ -1,0 +1,9 @@
+codigo,producto,categoria,cantidad,precioUnitario,proveedor
+INV-001,Notebook Dell XPS 15,Computadoras,25,1299.99,Dell Inc
+INV-002,Impresora HP LaserJet,Impresoras,12,299.99,HP Corporation
+INV-003,Disco Duro Externo 2TB,Almacenamiento,50,89.99,Seagate
+INV-004,Memoria RAM 16GB DDR4,Componentes,100,79.99,Corsair
+INV-005,Webcam Logitech C920,Periféricos,35,69.99,Logitech
+INV-006,Teclado Mecánico RGB,Periféricos,40,129.99,Razer
+INV-007,Monitor LG 27 pulgadas,Monitores,18,349.99,LG Electronics
+

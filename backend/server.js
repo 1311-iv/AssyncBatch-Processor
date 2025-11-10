@@ -33,6 +33,20 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Agregar ruta raíz informativa
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'AsyncBatch Processor API',
+    endpoints: {
+      health: '/health',
+      upload: 'POST /api/upload',
+      files: 'GET /api/files',
+      batch: 'GET /api/batch/:batchId'
+    }
+  });
+});
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,

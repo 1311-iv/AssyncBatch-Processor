@@ -1,0 +1,40 @@
+[
+  {
+    "codigo": "PROD-001",
+    "nombre": "Smartphone Samsung Galaxy S24",
+    "categoria": "Electrónica",
+    "precio": 899.99,
+    "stock": 45,
+    "disponible": true,
+    "especificaciones": {
+      "pantalla": "6.2 pulgadas",
+      "memoria": "128GB",
+      "ram": "8GB"
+    }
+  },
+  {
+    "codigo": "PROD-002",
+    "nombre": "Auriculares Bluetooth Sony",
+    "categoria": "Audio",
+    "precio": 199.99,
+    "stock": 30,
+    "disponible": true,
+    "especificaciones": {
+      "bateria": "30 horas",
+      "cancelacionRuido": true
+    }
+  },
+  {
+    "codigo": "PROD-003",
+    "nombre": "Tablet iPad Pro 12.9",
+    "categoria": "Electrónica",
+    "precio": 1299.99,
+    "stock": 15,
+    "disponible": true,
+    "especificaciones": {
+      "pantalla": "12.9 pulgadas",
+      "almacenamiento": "256GB"
+    }
+  }
+]
+

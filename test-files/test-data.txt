@@ -1,0 +1,16 @@
+Línea 1: Datos de prueba para procesamiento batch
+Línea 2: Información de clientes y productos
+Línea 3: Registros de transacciones y ventas
+Línea 4: Datos de inventario y almacenamiento
+Línea 5: Información de usuarios y permisos
+Línea 6: Logs de sistema y errores
+Línea 7: Métricas de rendimiento y análisis
+Línea 8: Configuraciones y parámetros del sistema
+Línea 9: Datos de respaldo y recuperación
+Línea 10: Información de auditoría y seguridad
+Línea 11: Datos de integración con APIs externas
+Línea 12: Información de facturación y pagos
+Línea 13: Datos de reportes y estadísticas
+Línea 14: Configuración de notificaciones
+Línea 15: Última línea del archivo de prueba
+

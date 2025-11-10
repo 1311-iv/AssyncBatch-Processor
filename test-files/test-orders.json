@@ -1,0 +1,29 @@
+{
+  "ordenes": [
+    {
+      "numeroOrden": "ORD-2024-001",
+      "cliente": "Juan Pérez",
+      "fecha": "2024-01-15T10:30:00Z",
+      "total": 1250.50,
+      "estado": "completada",
+      "items": [
+        {"producto": "Laptop", "cantidad": 1, "precio": 999.99},
+        {"producto": "Mouse", "cantidad": 2, "precio": 125.26}
+      ]
+    },
+    {
+      "numeroOrden": "ORD-2024-002",
+      "cliente": "María González",
+      "fecha": "2024-01-16T14:20:00Z",
+      "total": 450.75,
+      "estado": "pendiente",
+      "items": [
+        {"producto": "Teclado", "cantidad": 1, "precio": 150.25},
+        {"producto": "Monitor", "cantidad": 1, "precio": 300.50}
+      ]
+    }
+  ],
+  "totalOrdenes": 2,
+  "fechaReporte": "2024-01-17"
+}
+

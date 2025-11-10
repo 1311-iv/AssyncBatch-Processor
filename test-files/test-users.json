@@ -1,0 +1,48 @@
+[
+  {
+    "id": 1,
+    "nombre": "Carlos Mendoza",
+    "email": "carlos.mendoza@test.com",
+    "edad": 28,
+    "ciudad": "Buenos Aires",
+    "activo": true,
+    "fechaRegistro": "2024-01-15"
+  },
+  {
+    "id": 2,
+    "nombre": "Sofía Ramírez",
+    "email": "sofia.ramirez@test.com",
+    "edad": 32,
+    "ciudad": "Córdoba",
+    "activo": true,
+    "fechaRegistro": "2024-02-20"
+  },
+  {
+    "id": 3,
+    "nombre": "Diego Torres",
+    "email": "diego.torres@test.com",
+    "edad": 25,
+    "ciudad": "Rosario",
+    "activo": false,
+    "fechaRegistro": "2024-03-10"
+  },
+  {
+    "id": 4,
+    "nombre": "Valentina López",
+    "email": "valentina.lopez@test.com",
+    "edad": 30,
+    "ciudad": "Mendoza",
+    "activo": true,
+    "fechaRegistro": "2024-04-05"
+  },
+  {
+    "id": 5,
+    "nombre": "Martín Herrera",
+    "email": "martin.herrera@test.com",
+    "edad": 27,
+    "ciudad": "La Plata",
+    "activo": true,
+    "fechaRegistro": "2024-05-12"
+  }
+]
+

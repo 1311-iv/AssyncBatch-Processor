@@ -3,6 +3,11 @@ require('dotenv').config();
 
 const connectDB = async () => {
   try {
+    // Validar que MONGODB_URI esté definida
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI no está definida en las variables de entorno');
+    }
+
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB conectado exitosamente');
     console.log(`Base de datos: ${mongoose.connection.name}`);

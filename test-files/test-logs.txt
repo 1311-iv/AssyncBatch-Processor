@@ -1,0 +1,11 @@
+2024-01-15 10:30:15 INFO - Sistema iniciado correctamente
+2024-01-15 10:31:22 DEBUG - Conexión a base de datos establecida
+2024-01-15 10:32:45 INFO - Usuario autenticado: admin@test.com
+2024-01-15 10:33:10 WARNING - Tiempo de respuesta lento en endpoint /api/files
+2024-01-15 10:34:20 INFO - Archivo procesado exitosamente: test-data.csv
+2024-01-15 10:35:05 ERROR - Error al procesar archivo: invalid-file.json
+2024-01-15 10:36:12 INFO - Proceso de batch completado: 150 registros procesados
+2024-01-15 10:37:30 DEBUG - Cache actualizado con 50 entradas nuevas
+2024-01-15 10:38:45 INFO - Sesión de usuario cerrada correctamente
+2024-01-15 10:39:00 INFO - Sistema detenido
+
