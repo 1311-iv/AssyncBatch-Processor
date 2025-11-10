@@ -4,6 +4,8 @@
  * Permite descargar reportes individuales
  */
 
+import apiService from '../services/apiService.js';
+
 export class ResultsTable {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
@@ -11,6 +13,7 @@ export class ResultsTable {
     this.filteredResults = [];
     this.sortColumn = null;
     this.sortDirection = 'asc'; // 'asc' | 'desc'
+    this.editModal = null;
   }
 
   /**
@@ -19,8 +22,10 @@ export class ResultsTable {
    */
   init(results) {
     this.results = results.map((result, index) => ({
-      id: index,
-      filename: result.filename || 'Unknown',
+      id: result._id || result.id || index, // Usar _id de MongoDB si está disponible
+      _id: result._id || null, // Guardar _id para operaciones CRUD
+      filename: result.filename || result.originalName || 'Unknown',
+      originalName: result.originalName || result.filename || 'Unknown',
       status: result.status || 'unknown',
       recordsCount: result.recordsCount || 0,
       processingTime: result.processingTime || 0,
@@ -127,6 +132,45 @@ export class ResultsTable {
           </button>
         </div>
       </div>
+
+      <!-- Modal de edición -->
+      <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editModalLabel">Editar Archivo</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="edit-form">
+                <div class="mb-3">
+                  <label for="edit-filename" class="form-label">Nombre de Archivo</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    id="edit-filename" 
+                    required
+                  >
+                </div>
+                <div class="mb-3">
+                  <label for="edit-recordsCount" class="form-label">Cantidad de Registros</label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="edit-recordsCount" 
+                    min="0"
+                    required
+                  >
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-primary" id="save-edit-btn">Guardar</button>
+            </div>
+          </div>
+        </div>
+      </div>
     `;
 
     this.attachEventListeners();
@@ -148,6 +192,8 @@ export class ResultsTable {
         ? '<span class="badge bg-success">✓ Completado</span>'
         : '<span class="badge bg-danger">✗ Fallido</span>';
 
+      const hasId = result._id || result.id;
+
       return `
         <tr>
           <td>
@@ -164,14 +210,24 @@ export class ResultsTable {
             ${result.processingTime}
           </td>
           <td class="text-center">
-            ${result.status === 'completed' 
-              ? `<button class="btn btn-sm btn-outline-primary download-btn" data-id="${result.id}">
-                   <i class="bi bi-download"></i> Descargar
-                 </button>`
-              : `<button class="btn btn-sm btn-outline-secondary" disabled title="${result.errorMessage}">
-                   <i class="bi bi-info-circle"></i> Ver Error
-                 </button>`
-            }
+            <div class="btn-group" role="group">
+              ${result.status === 'completed' 
+                ? `<button class="btn btn-sm btn-outline-primary download-btn" data-id="${result.id}">
+                     <i class="bi bi-download"></i> Descargar
+                   </button>`
+                : `<button class="btn btn-sm btn-outline-secondary" disabled title="${result.errorMessage}">
+                     <i class="bi bi-info-circle"></i> Ver Error
+                   </button>`
+              }
+              ${hasId ? `
+                <button class="btn btn-sm btn-outline-warning edit-btn" data-id="${result._id || result.id}">
+                  <i class="bi bi-pencil"></i> Editar
+                </button>
+                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${result._id || result.id}">
+                  <i class="bi bi-trash"></i> Eliminar
+                </button>
+              ` : ''}
+            </div>
           </td>
         </tr>
       `;
@@ -181,9 +237,11 @@ export class ResultsTable {
   attachEventListeners() {
     // Búsqueda/filtrado
     const searchInput = this.container.querySelector('#search-input');
-    searchInput.addEventListener('keyup', (e) => {
-      this.filterResults(e.target.value);
-    });
+    if (searchInput) {
+      searchInput.addEventListener('keyup', (e) => {
+        this.filterResults(e.target.value);
+      });
+    }
 
     // Sorting por columna
     const sortableHeaders = this.container.querySelectorAll('.sortable');
@@ -203,11 +261,39 @@ export class ResultsTable {
       });
     });
 
+    // Botones de edición
+    const editButtons = this.container.querySelectorAll('.edit-btn');
+    editButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const fileId = e.currentTarget.dataset.id;
+        this.editResult(fileId);
+      });
+    });
+
+    // Botones de eliminación
+    const deleteButtons = this.container.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const fileId = e.currentTarget.dataset.id;
+        this.deleteResult(fileId);
+      });
+    });
+
+    // Botón guardar edición
+    const saveEditBtn = this.container.querySelector('#save-edit-btn');
+    if (saveEditBtn) {
+      saveEditBtn.addEventListener('click', () => {
+        this.saveEdit();
+      });
+    }
+
     // Exportar todos
     const exportAllBtn = this.container.querySelector('#export-all-btn');
-    exportAllBtn.addEventListener('click', () => {
-      this.exportAllResults();
-    });
+    if (exportAllBtn) {
+      exportAllBtn.addEventListener('click', () => {
+        this.exportAllResults();
+      });
+    }
   }
 
   /**
@@ -276,6 +362,24 @@ export class ResultsTable {
         this.downloadResult(resultId);
       });
     });
+
+    // Re-attachar listeners de botones de edición
+    const editButtons = tbody.querySelectorAll('.edit-btn');
+    editButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const fileId = e.currentTarget.dataset.id;
+        this.editResult(fileId);
+      });
+    });
+
+    // Re-attachar listeners de botones de eliminación
+    const deleteButtons = tbody.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const fileId = e.currentTarget.dataset.id;
+        this.deleteResult(fileId);
+      });
+    });
   }
 
   /**
@@ -304,6 +408,147 @@ export class ResultsTable {
 
     // Feedback visual
     this.showNotification(`Descargando ${result.filename}...`, 'success');
+  }
+
+  /**
+   * Eliminar resultado
+   */
+  async deleteResult(fileId) {
+    if (!confirm('¿Está seguro de que desea eliminar este archivo? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      const response = await apiService.deleteFile(fileId);
+
+      if (response.success) {
+        // Eliminar de arrays
+        this.results = this.results.filter(r => (r._id || r.id) !== fileId);
+        this.filteredResults = this.filteredResults.filter(r => (r._id || r.id) !== fileId);
+
+        // Actualizar tabla
+        this.updateTableBody();
+
+        this.showNotification(response.message || 'Archivo eliminado exitosamente', 'success');
+      } else {
+        this.showNotification(response.message || 'Error al eliminar archivo', 'error');
+      }
+    } catch (error) {
+      console.error('Error eliminando archivo:', error);
+      this.showNotification('Error al eliminar archivo', 'error');
+    }
+  }
+
+  /**
+   * Editar resultado - abrir modal
+   */
+  editResult(fileId) {
+    const result = this.results.find(r => (r._id || r.id) === fileId);
+    if (!result) {
+      this.showNotification('Archivo no encontrado', 'error');
+      return;
+    }
+
+    // Pre-llenar inputs del modal
+    const filenameInput = document.getElementById('edit-filename');
+    const recordsCountInput = document.getElementById('edit-recordsCount');
+
+    if (filenameInput) {
+      filenameInput.value = result.originalName || result.filename;
+    }
+    if (recordsCountInput) {
+      recordsCountInput.value = result.recordsCount || 0;
+    }
+
+    // Guardar fileId en el modal para usarlo al guardar
+    const modal = document.getElementById('editModal');
+    if (modal) {
+      modal.dataset.fileId = fileId;
+    }
+
+    // Abrir modal con Bootstrap
+    if (!this.editModal) {
+      this.editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    }
+    this.editModal.show();
+  }
+
+  /**
+   * Guardar edición
+   */
+  async saveEdit() {
+    const modal = document.getElementById('editModal');
+    if (!modal) {
+      return;
+    }
+
+    const fileId = modal.dataset.fileId;
+    if (!fileId) {
+      this.showNotification('Error: ID de archivo no encontrado', 'error');
+      return;
+    }
+
+    const filenameInput = document.getElementById('edit-filename');
+    const recordsCountInput = document.getElementById('edit-recordsCount');
+
+    if (!filenameInput || !recordsCountInput) {
+      this.showNotification('Error: Campos del formulario no encontrados', 'error');
+      return;
+    }
+
+    const originalName = filenameInput.value.trim();
+    const recordsCount = parseInt(recordsCountInput.value);
+
+    if (!originalName) {
+      this.showNotification('El nombre de archivo es requerido', 'error');
+      return;
+    }
+
+    if (isNaN(recordsCount) || recordsCount < 0) {
+      this.showNotification('La cantidad de registros debe ser un número válido', 'error');
+      return;
+    }
+
+    try {
+      const updates = {
+        originalName,
+        recordsCount
+      };
+
+      const response = await apiService.updateFile(fileId, updates);
+
+      if (response.success) {
+        // Actualizar en arrays
+        const resultIndex = this.results.findIndex(r => (r._id || r.id) === fileId);
+        if (resultIndex !== -1) {
+          this.results[resultIndex].originalName = originalName;
+          this.results[resultIndex].filename = originalName;
+          this.results[resultIndex].recordsCount = recordsCount;
+        }
+
+        const filteredIndex = this.filteredResults.findIndex(r => (r._id || r.id) === fileId);
+        if (filteredIndex !== -1) {
+          this.filteredResults[filteredIndex].originalName = originalName;
+          this.filteredResults[filteredIndex].filename = originalName;
+          this.filteredResults[filteredIndex].recordsCount = recordsCount;
+        }
+
+        // Actualizar tabla
+        this.updateTableBody();
+
+        // Cerrar modal
+        if (this.editModal) {
+          this.editModal.hide();
+        }
+
+        this.showNotification(response.message || 'Archivo actualizado exitosamente', 'success');
+      } else {
+        this.showNotification(response.message || 'Error al actualizar archivo', 'error');
+      }
+    } catch (error) {
+      console.error('Error actualizando archivo:', error);
+      this.showNotification('Error al actualizar archivo', 'error');
+    }
   }
 
   /**
@@ -353,6 +598,8 @@ export class ResultsTable {
   showNotification(message, type = 'info') {
     // Implementar sistema de notificaciones (Bootstrap Toast o custom)
     console.log(`[${type.toUpperCase()}] ${message}`);
+    // Puedes mejorar esto con Bootstrap Toasts
+    alert(message);
   }
 
   show() {

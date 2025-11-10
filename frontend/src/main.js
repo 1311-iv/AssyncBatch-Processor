@@ -38,6 +38,8 @@ class App {
 
     this.isProcessing = true;
 
+    // QUÉ HACE: try ejecuta el flujo principal, catch captura cualquier error durante el proceso, finally garantiza limpieza de estado
+    // POR QUÉ: Asegura que isProcessing se resetee y el componente se limpie siempre, incluso si falla la subida o el procesamiento
     try {
       this.progressTracker.init(files);
       this.resultsTable.hide();
@@ -110,6 +112,8 @@ class App {
       return this.processSingleResult(result, index);
     });
 
+    // QUÉ HACE: Promise.allSettled ejecuta todas las Promises y espera a que todas terminen (exitosas o fallidas), retornando un array con el estado de cada una
+    // POR QUÉ: Permite procesar múltiples archivos en paralelo sin que un fallo detenga los demás, obteniendo resultados completos de todos los archivos
     const settledResults = await Promise.allSettled(processingPromises);
 
     // Mapear resultados settled a formato de tabla

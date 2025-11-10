@@ -46,4 +46,10 @@ router.get('/batch/:batchId', fileController.getBatchStatus);
  */
 router.delete('/files/:id', fileController.deleteFile);
 
+/**
+ * PATCH /api/files/:id
+ * Actualizar archivo procesado
+ */
+router.patch('/files/:id', fileController.updateFile);
+
 module.exports = router;

@@ -11,6 +11,8 @@ class ApiService {
       setTimeout(() => reject(new Error('Request timeout')), this.timeout);
     });
 
+    // QUÉ HACE: Promise.race ejecuta un array de Promises y retorna la primera que se resuelve o rechaza, descartando las demás
+    // POR QUÉ: Permite implementar un timeout: si la petición fetch tarda más que timeoutPromise, se cancela automáticamente para evitar esperas indefinidas
     return Promise.race([
       fetch(url, options),
       timeoutPromise
@@ -37,6 +39,8 @@ class ApiService {
   async uploadFiles(files, onProgress = null) {
     let isLoading = true;
 
+    // QUÉ HACE: try ejecuta código asíncrono, catch captura errores que puedan ocurrir, finally siempre se ejecuta al final sin importar éxito o error
+    // POR QUÉ: Garantiza manejo de errores (timeouts, red, servidor) y limpieza de estado (isLoading) siempre, incluso si algo falla
     try {
       if (!files || files.length === 0) {
         throw new Error('No files provided for upload');
@@ -195,6 +199,60 @@ class ApiService {
     } catch (error) {
       console.error('Error polling batch status:', error);
       throw error;
+    }
+  }
+
+  async deleteFile(fileId) {
+    // QUÉ HACE: async marca la función como asíncrona, await pausa la ejecución hasta que la Promise se resuelva, try/catch maneja errores de forma síncrona
+    // POR QUÉ: Permite escribir código asíncrono de forma secuencial y legible, manejando errores de red o servidor sin bloquear la interfaz
+    try {
+      const url = `${this.baseURL}/files/${fileId}`;
+      const response = await this.fetchWithTimeout(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await this.handleResponse(response);
+      return {
+        success: true,
+        message: data.message || 'Archivo eliminado exitosamente'
+      };
+
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      return {
+        success: false,
+        message: error.message || 'Error al eliminar archivo'
+      };
+    }
+  }
+
+  async updateFile(fileId, updates) {
+    try {
+      const url = `${this.baseURL}/files/${fileId}`;
+      const response = await this.fetchWithTimeout(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
+      });
+
+      const data = await this.handleResponse(response);
+      return {
+        success: true,
+        data: data.data,
+        message: data.message || 'Archivo actualizado exitosamente'
+      };
+
+    } catch (error) {
+      console.error('Error updating file:', error);
+      return {
+        success: false,
+        message: error.message || 'Error al actualizar archivo'
+      };
     }
   }
 }

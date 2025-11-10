@@ -28,6 +28,8 @@ exports.uploadFiles = async (req, res) => {
       processFile(file, batchId)
     );
 
+    // QUÉ HACE: Promise.allSettled ejecuta todas las Promises en paralelo y espera a que todas terminen, retornando un array con el estado (fulfilled/rejected) de cada una
+    // POR QUÉ: Permite procesar múltiples archivos simultáneamente sin que un error detenga el resto, obteniendo resultados completos del batch completo
     const results = await Promise.allSettled(processingPromises);
     const processedResults = results.map((result, index) => {
       const file = req.files[index];
@@ -102,6 +104,8 @@ async function processFile(file, batchId) {
   const startTime = Date.now();
   let fileDoc = null;
 
+  // QUÉ HACE: async marca la función como asíncrona, await pausa hasta que las Promises se resuelvan, try maneja el flujo exitoso, catch captura errores, finally siempre ejecuta limpieza
+  // POR QUÉ: Permite procesar archivos de forma asíncrona con manejo de errores robusto, garantizando que los archivos temporales se eliminen siempre (finally) incluso si hay errores
   try {
     fileDoc = await File.create({
       filename: file.filename,
@@ -314,6 +318,57 @@ exports.deleteFile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error eliminando archivo',
+      error: error.message
+    });
+  }
+};
+
+exports.updateFile = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { originalName, recordsCount } = req.body;
+
+    // Validar que al menos un campo esté presente
+    if (!originalName && recordsCount === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Debe proporcionar al menos un campo para actualizar (originalName o recordsCount)'
+      });
+    }
+
+    // Construir objeto de actualización solo con campos proporcionados
+    const updateData = {};
+    if (originalName !== undefined) {
+      updateData.originalName = originalName;
+    }
+    if (recordsCount !== undefined) {
+      updateData.recordsCount = recordsCount;
+    }
+
+    const file = await File.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!file) {
+      return res.status(404).json({
+        success: false,
+        message: 'Archivo no encontrado'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: file,
+      message: 'Archivo actualizado exitosamente'
+    });
+
+  } catch (error) {
+    console.error('Error actualizando archivo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error actualizando archivo',
       error: error.message
     });
   }

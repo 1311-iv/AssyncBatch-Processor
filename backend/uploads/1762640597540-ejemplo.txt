@@ -1,0 +1,11 @@
+Esta es la primera línea del archivo de prueba
+Segunda línea con información importante
+Tercera línea con más datos para procesar
+Cuarta línea del documento de ejemplo
+Quinta línea con contenido adicional
+Sexta línea para testing de procesamiento
+Séptima línea del archivo TXT
+Octava línea con más información
+Novena línea de datos de prueba
+Décima y última línea del archivo de ejemplo
+
