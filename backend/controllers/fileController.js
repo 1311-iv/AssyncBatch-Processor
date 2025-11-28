@@ -24,19 +24,21 @@ exports.uploadFiles = async (req, res) => {
       startedAt: new Date()
     });
 
+    //Promise.allSettled: ejecuta todas las Promises en paralelo y espera a que todas terminen, retornando un array con el estado (fulfilled/rejected) de cada una
     const processingPromises = req.files.map(file => 
       processFile(file, batchId)
     );
 
-    // QUÉ HACE: Promise.allSettled ejecuta todas las Promises en paralelo y espera a que todas terminen, retornando un array con el estado (fulfilled/rejected) de cada una
-    // POR QUÉ: Permite procesar múltiples archivos simultáneamente sin que un error detenga el resto, obteniendo resultados completos del batch completo
+
+    //•	`results`: variable que guardará el array de resultados después de que todas las Promises terminen.
     const results = await Promise.allSettled(processingPromises);
+    //•	`processedResults`: variable que guardará el array de resultados procesados después de que todas las Promises terminen.
     const processedResults = results.map((result, index) => {
       const file = req.files[index];
 
       if (result.status === 'fulfilled') {
         return {
-          filename: file.originalname,
+          filename: file.originalnamxe,
           status: 'completed',
           recordsCount: result.value.recordsCount,
           processingTime: result.value.processingTime,
